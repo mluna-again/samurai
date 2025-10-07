@@ -4,10 +4,18 @@ import (
 	"log"
 
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
 )
 
 const SM_BREAK = 50
 const MD_BREAK = 60
+
+type layout int
+
+const (
+	VERTICAL layout = iota
+	HORIZONTAL
+)
 
 var globalErr error = nil
 
@@ -17,13 +25,16 @@ type model struct {
 	lgBanner      []string
 	currentBanner []string
 	currentFrame  int
+	layout        layout
 	ready         bool
 	width         int
 	heigth        int
 }
 
 func newSamurai() model {
-	return model{}
+	return model{
+		layout: VERTICAL,
+	}
 }
 
 func (m model) Init() tea.Cmd {
@@ -62,6 +73,11 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.currentBanner = m.lgBanner
 		}
 		m.currentFrame = 0
+		if lipgloss.Height(m.View()) > m.heigth {
+			m.layout = HORIZONTAL
+		} else {
+			m.layout = VERTICAL
+		}
 		return m, tea.ClearScreen
 
 	case tea.KeyMsg:
