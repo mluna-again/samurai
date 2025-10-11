@@ -1,11 +1,14 @@
 package main
 
 import (
+	"flag"
 	"log"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 )
+
+var noanimate bool
 
 const SM_BREAK = 50
 const MD_BREAK = 60
@@ -60,6 +63,9 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.lgBanner = msg.lg
 		m.currentBanner = m.lgBanner
 		m.ready = true
+		if noanimate {
+			return m, nil
+		}
 		return m, m.tickBanner()
 
 	case tea.WindowSizeMsg:
@@ -95,6 +101,9 @@ func (m model) View() string {
 }
 
 func main() {
+	flag.BoolVar(&noanimate, "noanimate", false, "don't animate ascii art")
+	flag.Parse()
+
 	p := tea.NewProgram(newSamurai())
 	_, err := p.Run()
 	if err != nil {
