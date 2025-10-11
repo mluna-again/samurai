@@ -26,7 +26,7 @@ func (m model) sessionList() string {
 		}
 	}
 
-	lines := []string{lipgloss.PlaceHorizontal(width, lipgloss.Center, sessionTitle)}
+	lines := []string{lipgloss.PlaceHorizontal(width, lipgloss.Center, title.Render(sessionTitle)), ""}
 	margin := 4
 	for _, sess := range m.sessions {
 		right := sess[0]

@@ -130,7 +130,7 @@ func (m model) View() string {
 func main() {
 	flag.BoolVar(&noanimate, "noanimate", false, "don't animate ascii art")
 	flag.StringVar(&separator, "sep", "@", "component separator")
-	flag.StringVar(&sessionTitle, "title", "Recent sessions", "Sessions header")
+	flag.StringVar(&sessionTitle, "title", " Recent sessions ", "Sessions header")
 	flag.StringVar(&rightDates, "rformat", time.Kitchen, "Treats right components as epoch values and formats them with the given format, an empty string disables this")
 	flag.Usage = func() {
 		fmt.Fprintf(os.Stderr, "Usage\n")
