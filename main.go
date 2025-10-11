@@ -108,7 +108,21 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m model) View() string {
-	return m.banner()
+	banner := m.banner()
+	if m.layout == VERTICAL {
+		banner = lipgloss.PlaceHorizontal(m.width, lipgloss.Center, banner)
+	}
+
+	list := m.sessionList()
+	if m.layout == VERTICAL {
+		list = lipgloss.PlaceHorizontal(m.width, lipgloss.Center, list)
+		return lipgloss.JoinVertical(lipgloss.Top, banner, list)
+	}
+
+	list = lipgloss.PlaceVertical(m.heigth, lipgloss.Center, list)
+	content := lipgloss.JoinHorizontal(lipgloss.Center, banner, list)
+
+	return lipgloss.Place(m.width, m.heigth, lipgloss.Center, lipgloss.Center, content)
 }
 
 func main() {

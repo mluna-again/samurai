@@ -19,7 +19,7 @@ func loadSessions() ([][]string, error) {
 			continue
 		}
 
-		if counter >= 9 {
+		if counter > 9 {
 			break
 		}
 		lines = append(lines, line)
@@ -33,7 +33,7 @@ func loadSessions() ([][]string, error) {
 	for _, line := range lines {
 		cmps := strings.Split(line, separator)
 		if len(cmps) < 2 {
-			mapped = append(mapped, []string{line})
+			mapped = append(mapped, []string{line, ""})
 			continue
 		}
 
