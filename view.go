@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/charmbracelet/lipgloss"
@@ -28,8 +29,9 @@ func (m model) sessionList() string {
 
 	lines := []string{lipgloss.PlaceHorizontal(width, lipgloss.Center, title.Render(sessionTitle)), ""}
 	margin := 4
-	for _, sess := range m.sessions {
-		right := sess[0]
+	for i, sess := range m.sessions {
+		ind := index.Render(fmt.Sprintf(" %d ", i))
+		right := fmt.Sprintf("%s %s", ind, sess[0])
 		left := sess[1]
 		w := width - lipgloss.Width(right) - lipgloss.Width(left) - margin*2
 		if w < 0 {

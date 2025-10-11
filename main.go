@@ -5,16 +5,23 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strconv"
 	"time"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/muesli/termenv"
 )
 
+// FLAGS
 var noanimate bool
 var separator string
 var sessionTitle string
 var rightDates string
+
+// FLAGS
+
+var response string = ""
 
 const SM_BREAK = 50
 const MD_BREAK = 60
@@ -100,7 +107,16 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, tea.ClearScreen
 
 	case tea.KeyMsg:
-		switch msg.String() {
+		keystroke := msg.String()
+		if len(m.sessions) > 0 {
+			num, err := strconv.Atoi(keystroke)
+			if err == nil && num >= 0 && num < len(m.sessions) {
+				response = m.sessions[num][0]
+				return m, tea.Quit
+			}
+		}
+
+		switch keystroke {
 		case "ctrl+c", "q":
 			return m, tea.Quit
 		}
@@ -128,6 +144,8 @@ func (m model) View() string {
 }
 
 func main() {
+	lipgloss.SetColorProfile(termenv.TrueColor)
+
 	flag.BoolVar(&noanimate, "noanimate", false, "don't animate ascii art")
 	flag.StringVar(&separator, "sep", "@", "component separator")
 	flag.StringVar(&sessionTitle, "title", " Recent sessions ", "Sessions header")
@@ -144,12 +162,16 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	p := tea.NewProgram(m)
+	p := tea.NewProgram(m, tea.WithOutput(os.Stderr), tea.WithAltScreen())
 	_, err = p.Run()
 	if err != nil {
 		log.Fatal(err)
 	}
 	if globalErr != nil {
 		log.Fatal(globalErr)
+	}
+
+	if response != "" {
+		fmt.Println(response)
 	}
 }
