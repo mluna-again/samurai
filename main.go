@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"time"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -13,6 +14,7 @@ import (
 var noanimate bool
 var separator string
 var sessionTitle string
+var rightDates string
 
 const SM_BREAK = 50
 const MD_BREAK = 60
@@ -129,6 +131,7 @@ func main() {
 	flag.BoolVar(&noanimate, "noanimate", false, "don't animate ascii art")
 	flag.StringVar(&separator, "sep", "@", "component separator")
 	flag.StringVar(&sessionTitle, "title", "Recent sessions", "Sessions header")
+	flag.StringVar(&rightDates, "rformat", time.Kitchen, "Treats right components as epoch values and formats them with the given format, an empty string disables this")
 	flag.Usage = func() {
 		fmt.Fprintf(os.Stderr, "Usage\n")
 		fmt.Fprintf(os.Stderr, "samurai reads from stdin and accepts up to 10 lines. each line can have 2 components, one on the right and one on the left, they should be separated by -sep\n\n")

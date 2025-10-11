@@ -5,7 +5,9 @@ import (
 	"errors"
 	"io"
 	"os"
+	"strconv"
 	"strings"
+	"time"
 )
 
 func loadSessions() ([][]string, error) {
@@ -26,7 +28,7 @@ func loadSessions() ([][]string, error) {
 		counter++
 	}
 	if err := reader.Err(); err != nil && !errors.Is(err, io.EOF) {
-		return [][]string{}, err
+		return nil, err
 	}
 
 	mapped := [][]string{}
@@ -37,7 +39,17 @@ func loadSessions() ([][]string, error) {
 			continue
 		}
 
-		mapped = append(mapped, []string{cmps[0], cmps[1]})
+		right := cmps[1]
+		if rightDates != "" {
+			epoch, err := strconv.Atoi(right)
+			if err != nil {
+				return nil, err
+			}
+			t := time.Unix(int64(epoch), 0)
+
+			right = t.Format(rightDates)
+		}
+		mapped = append(mapped, []string{cmps[0], right})
 	}
 
 	return mapped, nil
