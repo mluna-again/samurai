@@ -2,13 +2,17 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log"
+	"os"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 )
 
 var noanimate bool
+var separator string
+var sessionTitle string
 
 const SM_BREAK = 50
 const MD_BREAK = 60
@@ -32,12 +36,19 @@ type model struct {
 	ready         bool
 	width         int
 	heigth        int
+	sessions      [][]string
 }
 
-func newSamurai() model {
-	return model{
-		layout: VERTICAL,
+func newSamurai() (model, error) {
+	sessions, err := loadSessions()
+	if err != nil {
+		return model{}, err
 	}
+
+	return model{
+		layout:   VERTICAL,
+		sessions: sessions,
+	}, nil
 }
 
 func (m model) Init() tea.Cmd {
@@ -102,10 +113,22 @@ func (m model) View() string {
 
 func main() {
 	flag.BoolVar(&noanimate, "noanimate", false, "don't animate ascii art")
+	flag.StringVar(&separator, "sep", "@", "component separator")
+	flag.StringVar(&sessionTitle, "title", "Recent sessions", "Sessions header")
+	flag.Usage = func() {
+		fmt.Fprintf(os.Stderr, "Usage\n")
+		fmt.Fprintf(os.Stderr, "samurai reads from stdin and accepts up to 10 lines. each line can have 2 components, one on the right and one on the left, they should be separated by -sep\n\n")
+		fmt.Fprintf(os.Stderr, "$ tmux list-sessions -a -F '#{session_name}@#{session_created}' | samurai -sep @\n\n")
+		flag.PrintDefaults()
+	}
 	flag.Parse()
 
-	p := tea.NewProgram(newSamurai())
-	_, err := p.Run()
+	m, err := newSamurai()
+	if err != nil {
+		log.Fatal(err)
+	}
+	p := tea.NewProgram(m)
+	_, err = p.Run()
 	if err != nil {
 		log.Fatal(err)
 	}
