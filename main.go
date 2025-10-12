@@ -22,6 +22,7 @@ var rightDates string
 // FLAGS
 
 var response string = ""
+var forcedLayout string
 
 const SM_BREAK = 50
 const MD_BREAK = 60
@@ -54,8 +55,15 @@ func newSamurai() (model, error) {
 		return model{}, err
 	}
 
+	l := VERTICAL
+	if forcedLayout == "vertical" {
+		l = VERTICAL
+	} else if forcedLayout == "horizontal" {
+		l = HORIZONTAL
+	}
+
 	return model{
-		layout:   VERTICAL,
+		layout:   l,
 		sessions: sessions,
 	}, nil
 }
@@ -99,10 +107,12 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.currentBanner = m.lgBanner
 		}
 		m.currentFrame = 0
-		if lipgloss.Height(m.View()) > m.heigth {
-			m.layout = HORIZONTAL
-		} else {
-			m.layout = VERTICAL
+		if forcedLayout == "" {
+			if lipgloss.Height(m.View()) > m.heigth {
+				m.layout = HORIZONTAL
+			} else {
+				m.layout = VERTICAL
+			}
 		}
 		return m, tea.ClearScreen
 
@@ -150,6 +160,7 @@ func main() {
 	flag.StringVar(&separator, "sep", "@", "component separator")
 	flag.StringVar(&sessionTitle, "title", " Recent sessions ", "Sessions header")
 	flag.StringVar(&rightDates, "rformat", time.Kitchen, "Treats right components as epoch values and formats them with the given format, an empty string disables this")
+	flag.StringVar(&forcedLayout, "layout", "", "layout. by default it automatically changes when the screen is resized to try to fit it, but you can force a specific one. can be either vertical or horizontal.")
 	flag.Usage = func() {
 		fmt.Fprintf(os.Stderr, "Usage\n")
 		fmt.Fprintf(os.Stderr, "samurai reads from stdin and accepts up to 10 lines. each line can have 2 components, one on the right and one on the left, they should be separated by -sep\n\n")
