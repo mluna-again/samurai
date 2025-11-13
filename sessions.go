@@ -40,7 +40,7 @@ func loadSessions() ([][]string, error) {
 		}
 
 		right := cmps[1]
-		if rightDates != "" {
+		if rightDates != "" && right != "" {
 			epoch, err := strconv.Atoi(right)
 			if err != nil {
 				return nil, err
